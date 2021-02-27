@@ -12,7 +12,7 @@ This was my first time using tkinter to make a GUI. I started watching the freec
 
 ## Design
 
-I based the color scheme on the iOS calculator and layed out a design in Figma. When it came time to build the layout in tkinter, I quickly learned that sizing components in pixels was harder than it seemed. After some Googling, I found that I could wrap the buttons in frames and then use pixel dimensions to size the frames. The grid() method of placement didn't seem to offer the precision I was looking for, so I opted to use place() so I could place everything everything exactly where I wanted it. 
+The color scheme was loosely based on the iOS calculator and I laid out the design in Figma. When it came time to build the layout in tkinter, I quickly learned that sizing components in pixels was harder than it seemed. After some Googling, I found that I could wrap the buttons in frames and then use pixel dimensions to size the frames. The grid() method of placement didn't seem to offer the precision I was looking for, so I opted to use place() so I could place everything everything exactly where I wanted it. 
 
 
 <img src="/calculator_mockup.png" alt="image of the calculator design made in Figma" height="244px" width="164px" />
