@@ -14,38 +14,98 @@ std_btn_bg = "#b4b4b4"
 accent_text_color = "#ffffff"
 std_text_color = "#242424"
 bg_color = "#242424"
-std_font = tk_font.Font(family="Arial", size=14)  #weight=tkFont.BOLD
+std_font = tk_font.Font(family="Arial", size=14, weight=tk_font.BOLD)  
 display_font = tk_font.Font(family="Arial", size=18)
 display_color = "#e1e1e1"
-command_list = []
 del_icon = tk.PhotoImage(file = r"del_btn.png")   
 window_icon = tk.PhotoImage(file =r"calculator_icon.png")
 
-VALID_KEYS = ("<plus>", "<minus>", "<asterisk>", "<slash>", "<Return>", "<period>", "<c>")
+command_list = []
+finished_calculation = False
+
+# VALID_KEYS = ("<plus>", "<minus>", "<asterisk>", "<slash>", "<Return>", "<period>", "<c>")
 VALID_VALUES = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "+/-", "C", "del", "/", "*", "-", "+", ".", "=")
-#VALID_VALUES = ("+/-", "c", "C", "del", "/", "*", "-", "+", ".", "=")
 
 
-#Define functions
-
-last_operation = ""
-
-def button_click(val):
+def validate_entry(action_type, val):
+    """Validate entry in the display widget to only allow numbers 0-9 and the following strings: (*/+-=cC)"""
     
-    """The main function that runs when a button is clicked. The buttons value is passed in as an argument and used to determine which operation to perform"""
-    
-    global last_operation
-    # print("start of button click function")
-    # print(f"val is: {val}")
-  
-  
-
-    
+    #if the action type is an insertion, make sure it's a valid value
+    if action_type == "1":
         
-    
-    if val in "/*+-":
+        
+        if all(i in VALID_VALUES for i in val):
+            
+            
+            return True
+        
+    #if the action is a deletion, always allow it
+    elif action_type == "0":
+        return True
 
-        if display.get():
+    
+    return False
+
+
+
+####----------------------Define functions-------------------------------###
+
+
+
+def number_click(val):
+
+    print("start of number click function")
+    print(f"val: {val}")
+    global finished_calculation
+
+    if finished_calculation:
+        
+        display.delete(0, tk.END)  
+        display.insert(tk.END, val)
+        finished_calculation = False
+        print("after insert")
+        return "break"
+    else:
+        display.insert(tk.END, val)
+        print("end of the number click else")
+        return "break"
+    
+
+
+def pos_neg_click():
+    if display.get():
+
+        if display.get()[0] != "-":
+
+            display.insert(0, "-")
+
+        else:
+
+            display.delete(-1)
+
+    #if the display is empty, just insert - at the beginning so the subsequent entry will be negative
+    else:
+        display.insert(0, "-")
+
+
+def clear_click():
+
+    display.delete(0, tk.END)
+    command_list.clear()
+    print(f"command list: {command_list}")
+
+
+
+def delete_click():
+    #calculate the length of the characters on the display, then subtract one. Starting at that index, delete everything until the end (will just be the last character)
+    display.delete(len(display.get())-1, tk.END)
+
+
+
+def operator_click(val):
+
+
+    if display.get():
 
             #split the display content on "<" and grab just the first portion so that the keypress data isn't added to the command list
 
@@ -66,7 +126,7 @@ def button_click(val):
 
                     print(f"command list: {command_list}")
 
-                #if the last value is an operator, change that value to the newly-pressed operator 
+                #if the last value is an operator, replace that operator with the newly-pressed operator 
                 else:
                     command_list[-1] = val
 
@@ -78,45 +138,24 @@ def button_click(val):
                 print(f"command list: {command_list}")
 
 
-    elif val=="+/-":
 
-        #check to make sure there is a value before trying to make it negative
+
+def equals_click():
+
+    global finished_calculation
+    if command_list:
         if display.get():
 
-            if display.get()[0] != "-":
-
-                display.insert(0, "-")
-
-            else:
-
-                display.delete(-1)
-
-        #if the display is empty, just insert - at the beginning so the subsequent entry will be negative
-        else:
-            display.insert(0, "-")
-
-    elif val == "del":
-
-        #calculate the length of the characters on the display, then subtract one. Starting at that index, delete everything until the end (will just be the last character)
-        display.delete(len(display.get())-1, tk.END)
-
-    elif val == "c" or val == "C":
-
-        display.delete(0, tk.END)
-        command_list.clear()
-        print(f"command list: {command_list}")
-
-    elif val in ("=", "\r"):
-        
-        if display.get():
             # if command_list[-1] in "+-\*":
-            print("inside the elif if")
+    
             if display.get():
+
                 command_list.append(display.get())
                 display.delete(0, tk.END)          
                 result = eval(" ".join(command_list))
                 display.insert(0, result)
-                    #empty the command list to get ready for the next round of calculations
+
+                #empty the command list to get ready for the next round of calculations
                 command_list.clear()
 
         else:
@@ -126,138 +165,239 @@ def button_click(val):
             print(f"updated command_list: {command_list}")
             display.delete(0, tk.END)          
             result = eval(" ".join(command_list))
+
             #display the result
             display.insert(0, result)
             command_list.clear()
-               
+                
 
-        print(f"command list: {command_list}")
+            print(f"command list: {command_list}")
+    print("end of equals function")
+    finished_calculation = True
 
-    elif val == ".":
 
-        if command_list:
-            #check to make sure display isn't empty
-            if display.get():
 
-                if last_operation == "=":
-                    display.delete(0, tk.END)  
-                    display.insert(tk.END, val)
 
-                #insert . ONLY if the previous character isn't already a .
-                if display.get()[-1] !=".":
-                    display.insert(tk.END, val)
 
-            #if the display is empty, just insert . at the beginning so the subsequent entry will be a float
-            else: 
-                display.insert(tk.END, val)
 
+
+
+
+
+####---------------------------------------------Create Buttons---------------------------------------------------------###
+
+#The equals button wlll be double width at 132x60, all other buttons will be 60x60. Frames are used to hold the buttons so that they can be sized in pixels rather than tpye units.
+
+
+#-----------------------First Row--------------------------------
+
+pos_neg_frame = tk.Frame(root, height=60, width=60)
+pos_neg_button = tk.Button(pos_neg_frame, text="+/-", font=(std_font), bg=std_btn_bg, fg=std_text_color, command=pos_neg_click)
+
+# pos_neg_frame.place(x=26, y=114)
+# pos_neg_frame.propagate(False)
+
+# pos_neg_button.pack(expand=True, fill=tk.BOTH)
+
+clear_frame = tk.Frame(root, height=60, width=60)
+clear_button = tk.Button(clear_frame, text="C", font=(std_font), bg=std_btn_bg, fg=std_text_color, command=clear_click)
+# clear_frame.place(x=98, y=114)
+# clear_frame.propagate(False)
+
+# clear_button.pack(expand=True, fill=tk.BOTH)
+
+del_frame = tk.Frame(root, height=60, width=60)
+del_button = tk.Button(del_frame, font=(std_font), image=del_icon, bg=std_btn_bg, fg=std_text_color, command=delete_click)
+# del_frame.place(x=170, y=114)
+# del_frame.propagate(False)
+
+# del_button.pack(expand=True, fill=tk.BOTH)
+
+divide_frame = tk.Frame(root, height=60, width=60)
+divide_button = tk.Button(divide_frame, text="/", font=(std_font), bg=accent_btn_bg, fg=accent_text_color, command=lambda: operator_click("/"))
+# divide_frame.place(x=242, y=114)
+# divide_frame.propagate(False)
+
+# divide_button.pack(expand=True, fill=tk.BOTH)
+
+
+
+#-----------------------Second Row--------------------------------
+
+seven_frame = tk.Frame(root, height=60, width=60)
+seven_button = tk.Button(seven_frame, text="7", font=(std_font), bg=std_btn_bg, fg=std_text_color, command=lambda: number_click(7))
+# seven_frame.place(x=26, y=186)
+# seven_frame.propagate(False)
+
+# seven_button.pack(expand=True, fill=tk.BOTH)
+
+eight_frame = tk.Frame(root, height=60, width=60)
+eight_button = tk.Button(eight_frame, text="8", font=(std_font), bg=std_btn_bg, fg=std_text_color, command=lambda: number_click(8))
+# eight_frame.place(x=98, y=186)
+# eight_frame.propagate(False)
+
+# eight_button.pack(expand=True, fill=tk.BOTH)
+
+nine_frame = tk.Frame(root, height=60, width=60)
+nine_button = tk.Button(nine_frame, text="9", font=(std_font), bg=std_btn_bg, fg=std_text_color, command=lambda: number_click(9))
+# nine_frame.place(x=170, y=186)
+# nine_frame.propagate(False)
+
+# nine_button.pack(expand=True, fill=tk.BOTH)
+
+multiply_frame = tk.Frame(root, height=60, width=60)
+multiply_button = tk.Button(multiply_frame, text="*", font=(std_font), bg=accent_btn_bg, fg=accent_text_color, command=lambda: operator_click("*"))
+# multiply_frame.place(x=242, y=186)
+# multiply_frame.propagate(False)
+
+# multiply_button.pack(expand=True, fill=tk.BOTH)
+
+
+
+#-----------------------Third Row--------------------------------
+
+four_frame = tk.Frame(root, height=60, width=60)
+four_button = tk.Button(four_frame, text="4", font=(std_font), bg=std_btn_bg, fg=std_text_color, command=lambda: number_click(4))
+# four_frame.place(x=26, y=258)
+# four_frame.propagate(False)
+
+# four_button.pack(expand=True, fill=tk.BOTH)
+
+five_frame = tk.Frame(root, height=60, width=60)
+five_button = tk.Button(five_frame, text="5", font=(std_font), bg=std_btn_bg, fg=std_text_color, command=lambda: number_click(5))
+# five_frame.place(x=98, y=258)
+# five_frame.propagate(False)
+
+# five_button.pack(expand=True, fill=tk.BOTH)
+
+six_frame = tk.Frame(root, height=60, width=60)
+six_button = tk.Button(six_frame, text="6", font=(std_font), bg=std_btn_bg, fg=std_text_color, command=lambda: number_click(6))
+# six_frame.place(x=170, y=258)
+# six_frame.propagate(False)
+
+# six_button.pack(expand=True, fill=tk.BOTH)
+
+minus_frame = tk.Frame(root, height=60, width=60)
+minus_button = tk.Button(minus_frame, text="-", font=(std_font), bg=accent_btn_bg, fg=accent_text_color, command=lambda: operator_click("-"))
+# minus_frame.place(x=242, y=258)
+# minus_frame.propagate(False)
+
+# minus_button.pack(expand=True, fill=tk.BOTH)
+
+
+
+#-----------------------Fourth Row--------------------------------
+
+one_frame = tk.Frame(root, height=60, width=60)
+one_button = tk.Button(one_frame, text="1", font=(std_font), bg=std_btn_bg, fg=std_text_color, command=lambda: number_click(1))
+# one_frame.place(x=26, y=330)
+# one_frame.propagate(False)
+
+# one_button.pack(expand=True, fill=tk.BOTH)
+
+two_frame = tk.Frame(root, height=60, width=60)
+two_button = tk.Button(two_frame, text="2", font=(std_font), bg=std_btn_bg, fg=std_text_color, command=lambda: number_click(2))
+# two_frame.place(x=98, y=330)
+# two_frame.propagate(False)
+
+# two_button.pack(expand=True, fill=tk.BOTH)
+
+three_frame = tk.Frame(root, height=60, width=60)
+three_button = tk.Button(three_frame, text="3", font=(std_font), bg=std_btn_bg, fg=std_text_color, command=lambda: number_click(3))
+# three_frame.place(x=170, y=330)
+# three_frame.propagate(False)
+
+# three_button.pack(expand=True, fill=tk.BOTH)
+
+plus_frame = tk.Frame(root, height=60, width=60)
+plus_button = tk.Button(plus_frame, text="+", font=(std_font), bg=accent_btn_bg, fg=accent_text_color, command=lambda: operator_click("+"))
+# plus_frame.place(x=242, y=330)
+# plus_frame.propagate(False)
+
+# plus_button.pack(expand=True, fill=tk.BOTH)
+
+
+
+       
+#-----------------------Fifth Row---------------------------------#
+
+zero_frame = tk.Frame(root, height=60, width=60)
+zero_button = tk.Button(zero_frame, text="0", font=(std_font), bg=std_btn_bg, fg=std_text_color, command=lambda: number_click(0))
+# zero_frame.place(x=26, y=402)
+# zero_frame.propagate(False)
+
+# zero_button.pack(expand=True, fill=tk.BOTH)
+
+
+decimal_frame = tk.Frame(root, height=60, width=60)
+decimal_button = tk.Button(decimal_frame, text=".", font=(std_font), bg=std_btn_bg, fg=std_text_color, command=lambda: number_click("."))
+# decimal_frame.place(x=98, y=402)
+# decimal_frame.propagate(False)
+
+# decimal_button.pack(expand=True, fill=tk.BOTH)
+
+
+equal_frame = tk.Frame(root, height=60, width=132)
+equal_button = tk.Button(equal_frame, text="=", font=(std_font), bg=accent_btn_bg, fg=accent_text_color, command=equals_click)
+# equal_frame.place(x=170, y=402)
+# equal_frame.propagate(False)
+
+# equal_button.pack(expand=True, fill=tk.BOTH)
+
+
+
+
+frames = [pos_neg_frame, clear_frame, del_frame, divide_frame, seven_frame, eight_frame, nine_frame, multiply_frame, four_frame, five_frame, six_frame, minus_frame, one_frame, two_frame, three_frame, plus_frame, zero_frame, decimal_frame, equal_frame]
+
+buttons = [pos_neg_button, clear_button, del_button, divide_button, seven_button, eight_button, nine_button, multiply_button, four_button, five_button, six_button, minus_button, one_button, two_button, three_button, plus_button, zero_button, decimal_button, equal_button]
+
+
+x_coord = 26
+y_coord = 114
+
+for frame, button in zip(frames, buttons):
+
+
+    print(f"xcoord: {x_coord}")
+    print(f"ycoord: {y_coord}")
+    frame.propagate(False)
+    frame.place(x=x_coord, y=y_coord)
+    button.pack(expand=True, fill=tk.BOTH)
+
+    if x_coord == 242:
+        x_coord = 26
+        y_coord += 72
     else:
-        
-        
-        #check to see if the last operation was equals. If so, we want to clear the display and insert new values rather than append them to the number current displayed
-        print("inside the last operation section")
-        if last_operation == "=" or not last_operation:
-            print("inside the last operation section")
-            display.delete(0, tk.END)  
-            display.insert(tk.END, val)
+        x_coord += 72
 
-        else:
-            display.insert(tk.END, val)
-
-        
     
-    last_operation = val
-    print(f"last operation: {last_operation}")
-    print("end of button click function")
 
 
-def validate_entry(action_type, val):
-    """Validate entry in the display widget to only allow numbers 0-9 and the following strings: (*/+-=cC)"""
-    
-    #if the action type is an insertion, make sure it's a valid value
-    if action_type == "1":
-        
-        
-        if all(i in VALID_VALUES for i in val):
-            
-            # print(f"val: {val}")
-            # print(f"action type before true: {action_type}")
-            return True
-        
-    #if the action is a deletion, always allow it
-    elif action_type == "0":
-        return True
 
-    # print("-----before the false------")
-    # print(f"action type before false: {action_type}")
-    
-    # print(f"val before false: {val}")
-    # print(f"type of val: {type(val)}")
-    return False
 
+####--------------------------bind keys to functions-------------------------------------###
+
+# number keys and decimal keys are already bound by default
 
 def bind_keys():
 
-    """Bind keyboard keys to the button_click function and pass in their char attribute"""
+    root.bind("<plus>", lambda x: operator_click("+"))
+    root.bind("<minus>", lambda x: operator_click("-"))
+    root.bind("<asterisk>", lambda x: operator_click("*"))
+    root.bind("<slash>", lambda x: operator_click("/"))
+    root.bind("<Return>", lambda x: equals_click())
+    #root.bind("<period>", lambda x: number_click("."))
+    root.bind("<c>", lambda x: clear_click())
 
-    for key in VALID_KEYS:
-    #for key in ("+", "-", "/", "*", "<Return>", "."):
-
-        root.bind(key, lambda x: button_click(x.char))
-       
-
-def generate_buttons():
-
-    """Generates the buttons by iterating through the buttons list and then using the character as an argument to the button_click function"""
-
-    y_coord = 114
-    button_layout = [["+/-", "C", "del", "/"],[7, 8, 9, "*"], [4, 5, 6, "-"], [1, 2, 3, "+"], [0, ".", "="]]
-
-    for row in button_layout:
-
-        x_coord = 26
-        
-        for char in row:
-            
-            #set the size of the buttons. The equals button wlll be double width at 132x60, all other buttons will be 60x60. Frames are used to hold the buttons so that they can be sized in pixels rather than tpye units.
-
-            if char == "=":
-
-                button_frame = tk.Frame(root, height=60, width=132)            
-
-            else:
-
-                button_frame = tk.Frame(root, height=60, width=60)
-                
-
-            #The operator buttons will have a special color, all other buttons will be the default color. The delete button has an icon rather than a text label
-
-            if str(char) in ("+-*/="):            
-                
-                button = tk.Button(button_frame, text=str(char), font=(std_font), bg=accent_btn_bg, fg=accent_text_color, command=lambda val=char: button_click(str(val)))
-                
-            elif char == "del":
-
-                button = tk.Button(button_frame, font=(std_font), image=del_icon, bg=std_btn_bg, fg=accent_text_color, command=lambda val=char: button_click(str(val)))
-
-            else:
-
-                button = tk.Button(button_frame, text=str(char), font=(std_font), bg=std_btn_bg, fg=std_text_color, command=lambda val=char: button_click(str(val)))
-
-
-            button_frame.propagate(False)
-            button_frame.place(x=x_coord, y=y_coord)
-            button.pack(expand=True, fill=tk.BOTH)
-
-            #increment the x coordinates for the next iteration through the row. 60px button width + 12px padding = 72px increase for each iteration
-            x_coord += 72
-            
-        #increment the x coordinates to move on to the next row. 60px button height + 12px padding = 72px increase for each iteration
-        y_coord += 72
+    for i in range(10):
+        display.bind(str(i), lambda x: number_click(x.keysym))
 
 
 
-#configure and display GUI components
+
+
+
+###--------------------configure and display GUI components--------------------------------###
 
 root.geometry("328x488")
 root.configure(background="#242424")
@@ -282,12 +422,8 @@ display.pack(expand=True, fill=tk.BOTH, padx=12)
 
 
 
-#---------------------------------------------------------------------------------------------
-#Generate buttons and run the main loop
+###-----------------------Run the main loop and give focus to the dsiplay---------------------------###
 
-
-generate_buttons()
 bind_keys()
-
-
+display.focus()
 root.mainloop()
