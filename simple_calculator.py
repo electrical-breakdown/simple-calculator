@@ -119,7 +119,7 @@ def clear_click():
    
 
 
-def delete_click():
+def backspace_click():
 
     """Deletes the last number in the dislplay"""
 
@@ -251,7 +251,7 @@ clear_frame = tk.Frame(root, height=60, width=60)
 clear_button = tk.Button(clear_frame, text="C", font=(std_font), bg=std_btn_bg, fg=std_text_color, command=clear_click)
 
 del_frame = tk.Frame(root, height=60, width=60)
-del_button = tk.Button(del_frame, font=(std_font), image=del_icon, bg=std_btn_bg, fg=std_text_color, command=delete_click)
+del_button = tk.Button(del_frame, font=(std_font), image=del_icon, bg=std_btn_bg, fg=std_text_color, command=backspace_click)
 
 divide_frame = tk.Frame(root, height=60, width=60)
 divide_button = tk.Button(divide_frame, text="/", font=(std_font), bg=accent_btn_bg, fg=accent_text_color, command=lambda: operator_click("/"))
@@ -316,7 +316,6 @@ decimal_button = tk.Button(decimal_frame, text=".", font=(std_font), bg=std_btn_
 
 equal_frame = tk.Frame(root, height=60, width=132)
 equal_button = tk.Button(equal_frame, text="=", font=(std_font), bg=accent_btn_bg, fg=accent_text_color, command=equals_click)
-
 
 
 
