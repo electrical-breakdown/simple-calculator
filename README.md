@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Simple Calculator
 
 A simple calculator project to help me learn the basics of using tkinter.
@@ -31,4 +32,9 @@ I used nested loops to generate the frames and buttons because I thought that cr
 
 In the next iteration, I'd like to add some validation to the entry widget to restrict keyboard input to just the characters found on the GUI. I may also rewrite the logic as the way I did it feels a little gross, and I'm sure I can find a cleaner way next time. Looking forward to making GUIs for some of the other little Python games I've made. 
 
+=======
+######Simple Calculator
+
+A simple calculator project to help me learn how to make interfaces using tkinterPS 
+>>>>>>> 8be522a32153e1f162ff43b595013d7f77c9a47a
 
