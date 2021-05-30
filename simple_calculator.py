@@ -30,7 +30,7 @@ finished_calculation = False
 
 def validate_entry(action_type, val):
 
-    """Validate entry in the display widget to only allow numbers 0-9 and the following strings: (*/+-=cC)"""
+    """Validates entry in the display widget to only allow numbers 0-9 and the following strings: (*/+-=cC)"""
 
     valid_values = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "+/-", "C", "del", "/", "*", "-", "+", ".", "=")
     
@@ -108,6 +108,7 @@ def pos_neg_click():
     else:
         
         display.insert(0, "-")
+
 
 
 def clear_click():
@@ -196,6 +197,7 @@ def equals_click():
                 
     #the current calculation has been completed. Set vairable to True and begin a new set of calculations
     finished_calculation = True
+
 
 
 def bind_keys():
